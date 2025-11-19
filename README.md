@@ -1,72 +1,39 @@
-Here is the **complete, final `README.md`** in a single block.
+# Behavioral Cloning (Self-Driving Car)
 
-This version includes the **Dataset Creation Strategy** we discussed and explicitly lists the **critical SocketIO versions** (`4.6.1`) to prevent the common simulator connection error.
+An autonomous driving model trained using end-to-end deep learning. The model takes raw pixels from a front-facing camera and predicts the necessary steering angle in real-time.
 
-### Copy & Paste this into your `README.md` file:
+## Overview
+* **Simulator:** Udacity Self-Driving Car Simulator
+* **Framework:** Keras / TensorFlow
+* **Architecture:** CNN (Convolutional Neural Network)
+* **Input:** 3-Channel RGB Images
+* **Output:** Steering Angle (float)
 
-````markdown
-# Behavioral Cloning - Self-Driving Car
-
-This project uses a Convolutional Neural Network (CNN) to drive a car autonomously in a simulator. The model was trained using data collected from driving the car manually in the Udacity Self-Driving Car Simulator.
-
-## Project Files
-* **`model.h5`**: The saved model containing the trained weights.
-* **`drive.py`**: The script to interface with the simulator, sending steering angles and throttle commands in real-time.
-* **`trainingsim.py`**: The script used to create and train the model (data loading, augmentation, and network architecture).
-
----
-
-## Dataset Creation & Training Strategy
-
-The model was trained on data collected from the Udacity Simulator. The dataset creation process involved capturing images from three dashboard cameras (Center, Left, Right) along with the vehicle's steering angle, throttle, and speed.
-
-### 1. Data Collection Strategy
-To ensure the model generalizes well and doesn't just memorize the track, I used the following strategies:
-
-* **Center Lane Driving:** I recorded 2-3 laps of smooth driving, keeping the vehicle strictly in the center of the lane to teach the "ideal" behavior.
-* **Recovery Driving:** To teach the model how to handle mistakes, I recorded instances where I intentionally drove the car to the edge of the lane (near the curb) and then sharply steered back to the center. This teaches the network: *"If you see the curb this close, steer hard away from it."*
-* **Reverse Direction:** Since Track 1 is heavily biased towards left turns, I drove the track in the reverse direction to balance the dataset. This prevents the model from learning to simply "steer left" constantly.
-
-### 2. Data Preprocessing & Augmentation
-Before training, the raw data was processed to improve performance:
-
-* **Multiple Cameras:** I utilized images from the Left and Right cameras by adding a correction factor (±0.2) to the steering angle. This triples the dataset size and helps the car center itself.
-* **Cropping:** The top (sky/trees) and bottom (hood of the car) of the images were cropped out, as they contain irrelevant information that confuses the model.
-* **Flipping:** To further balance the left/right turn bias, I randomly flipped images horizontally and inverted the steering angle during training.
+## Repository Contents
+* `model.h5`: The trained model weights.
+* `drive.py`: Server script to interface with the simulator via SocketIO.
+* `trainingsim.py`: The training pipeline (data loading, augmentation, and model architecture).
 
 ---
 
-## How to Run
+## Training Approach
 
-### Dependencies
-**Critical:** You must use specific versions of `socketio` and `engineio` for the simulator to connect properly.
+### 1. Data Balancing
+The raw simulator data is heavily biased towards driving straight or turning left (Track 1). To prevent the model from overfitting to these biases:
+* **Multiple Cameras:** Utilized Left, Center, and Right camera feeds. A correction factor (`±0.2`) was applied to side cameras to teach the car to re-center itself.
+* **Flipping:** Randomly flipped images and steering angles (50% probability) to balance left vs. right turn frequency.
+
+### 2. Preprocessing
+* **Cropping:** Removed the top 70 pixels (sky/scenery) and bottom 25 pixels (car hood) to focus purely on the road lines.
+* **Recovery:** specifically recorded "recovery laps" where the car starts from the shoulder and steers back to the center, ensuring the model knows how to correct errors.
+
+---
+
+## Quick Start
+
+### Dependencies (Critical)
+The simulator requires specific versions of SocketIO to maintain a stable connection.
 
 ```bash
-pip install python-socketio==4.6.1
-pip install python-engineio==3.13.2
-pip install flask
-pip install eventlet
-pip install keras
-pip install tensorflow
-pip install numpy
-pip install opencv-python
-````
-
-### Execution Steps
-
-1.  **Download the Simulator:**
-    Download the Udacity Self-Driving Car Simulator [here](https://github.com/udacity/self-driving-car-sim).
-
-2.  **Start the Drive Script:**
-    Open your terminal in the project directory and run:
-
-    ```bash
-    python drive.py model.h5
-    ```
-
-3.  **Launch the Simulator:**
-    Open the simulator executable, select **"Autonomous Mode"**, and the car will start driving based on your model's predictions\!
-
-<!-- end list -->
-
-```
+pip install python-socketio==4.6.1 python-engineio==3.13.2
+pip install flask eventlet keras tensorflow numpy opencv-python
